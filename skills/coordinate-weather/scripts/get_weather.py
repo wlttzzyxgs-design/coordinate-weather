@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch current and forecast weather from Open-Meteo by coordinates."""
+"""Fetch current and forecast weather from a coordinate-based weather service."""
 
 from __future__ import annotations
 
@@ -18,13 +18,13 @@ from pathlib import Path
 from typing import Any, Callable
 
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 FREE_ENDPOINT = "https://api.open-meteo.com/v1/forecast"
 CUSTOMER_ENDPOINT = "https://customer-api.open-meteo.com/v1/forecast"
 ATTRIBUTION_URL = "https://open-meteo.com/"
 LICENCE_URL = "https://open-meteo.com/en/licence"
-USER_AGENT = f"open-meteo-weather-skill/{__version__}"
+USER_AGENT = f"coordinate-weather/{__version__}"
 MAX_DAYS = 16
 MAX_ATTEMPTS = 3
 HIGH_WIND_MS = 17.2
@@ -145,7 +145,7 @@ def validate_coordinates(latitude: float, longitude: float) -> None:
 
 
 def validate_days(days: int) -> None:
-    """Validate Open-Meteo forecast day count."""
+    """Validate weather forecast day count."""
     if not 1 <= days <= MAX_DAYS:
         raise WeatherValidationError(f"days must be between 1 and {MAX_DAYS}")
 
@@ -153,13 +153,13 @@ def validate_days(days: int) -> None:
 def resolve_api_mode(requested: str, env: dict[str, str] | None = None) -> tuple[str, str]:
     """Resolve API mode and key without exposing the key in output."""
     values = env if env is not None else os.environ
-    api_key = str(values.get("OPEN_METEO_API_KEY", "")).strip()
+    api_key = str(values.get("WEATHER_API_KEY", "")).strip()
     if requested == "free":
         return "free", ""
     if requested == "customer":
         if not api_key:
             raise WeatherValidationError(
-                "OPEN_METEO_API_KEY is required when --api-mode customer is used"
+                "WEATHER_API_KEY is required when --api-mode customer is used"
             )
         return "customer", api_key
     if api_key:
@@ -300,7 +300,7 @@ def normalize_weather(
     api_mode: str,
     lang: str,
 ) -> dict[str, Any]:
-    """Normalize Open-Meteo response into the skill's stable JSON contract."""
+    """Normalize weather response into the skill's stable JSON contract."""
     current_source = _section(payload, "current")
     hourly_source = _section(payload, "hourly")
     daily_source = _section(payload, "daily")
@@ -391,7 +391,7 @@ def normalize_weather(
             "utc_offset_seconds": payload.get("utc_offset_seconds"),
         },
         "provider": {
-            "name": "Open-Meteo",
+            "name": "Weather Data Service",
             "api_mode": api_mode,
             "requested_model": "best_match",
             "parameters": {
@@ -518,7 +518,7 @@ def render_markdown(data: dict[str, Any], lang: str = "zh-CN") -> str:
                 f"**海拔**：{_fmt(location.get('elevation'), 1, ' m')}"
             ),
             (
-                f"**数据源**：Open-Meteo（{provider['api_mode']}）  "
+                f"**数据源**：气象数据服务（{provider['api_mode']}）  "
                 f"**获取时间**：{provider['generated_at']}"
             ),
             "",
@@ -567,7 +567,7 @@ def render_markdown(data: dict[str, Any], lang: str = "zh-CN") -> str:
                 "## 数据说明",
                 "",
                 "- 时间采用坐标所在地自动时区；温度 ℃、风速 m/s、降水 mm。",
-                "- 免费 Open-Meteo 接口仅适用于非商业使用；商业部署应配置商业 API Key。",
+                "- 免费接口仅适用于非商业使用；商业部署应配置商业 API Key。",
                 f"- 数据署名：[Open-Meteo.com]({ATTRIBUTION_URL})，数据许可 CC BY 4.0。",
             ]
         )
@@ -581,7 +581,7 @@ def render_markdown(data: dict[str, Any], lang: str = "zh-CN") -> str:
                 f"**Elevation**: {_fmt(location.get('elevation'), 1, ' m')}"
             ),
             (
-                f"**Provider**: Open-Meteo ({provider['api_mode']})  "
+                f"**Provider**: Weather Data Service ({provider['api_mode']})  "
                 f"**Generated**: {provider['generated_at']}"
             ),
             "",
@@ -630,7 +630,7 @@ def render_markdown(data: dict[str, Any], lang: str = "zh-CN") -> str:
                 "## Data Notes",
                 "",
                 "- Times use the coordinate's automatic timezone; units are °C, m/s and mm.",
-                "- The free Open-Meteo API is for non-commercial use; commercial deployments need an API key.",
+                "- The free endpoint is for non-commercial use; commercial deployments need an API key.",
                 f"- Data attribution: [Open-Meteo.com]({ATTRIBUTION_URL}), CC BY 4.0.",
             ]
         )
@@ -665,7 +665,7 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Fetch current and 3-day weather from Open-Meteo by coordinates."
+        description="Fetch current and 3-day weather from a compatible weather service by coordinates."
     )
     parser.add_argument("--latitude", type=float, required=True)
     parser.add_argument("--longitude", type=float, required=True)
@@ -749,7 +749,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Input error: {exc}", file=sys.stderr)
         return 2
     except WeatherAPIError as exc:
-        print(f"Open-Meteo API error: {exc}", file=sys.stderr)
+        print(f"Weather API error: {exc}", file=sys.stderr)
         return 3
     except WeatherDataError as exc:
         print(f"Invalid weather data: {exc}", file=sys.stderr)

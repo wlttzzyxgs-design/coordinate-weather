@@ -1,0 +1,7 @@
+interface:
+  display_name: "Coordinate Weather"
+  short_description: "Fetch current and 3-day weather by coordinates"
+  default_prompt: "Use $coordinate-weather to get current and 3-day weather for the supplied coordinates."
+
+policy:
+  allow_implicit_invocation: true

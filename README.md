@@ -1,8 +1,8 @@
-# Open-Meteo Weather Skill
+# Coordinate Weather Skill
 
 [中文](#中文) | [English](#english)
 
-一个零第三方依赖的 Agent Skill：输入经纬度，自动从 Open-Meteo 获取当前天气、未来 3 天逐小时预报和每日摘要。支持普通天气与风电天气两套预设。
+一个零第三方依赖的 Agent Skill：输入经纬度，自动从兼容的天气数据服务获取当前天气、未来 3 天逐小时预报和每日摘要。支持普通天气与风电天气两套预设。
 
 ## 中文
 
@@ -24,24 +24,24 @@
 Windows PowerShell：
 
 ```powershell
-git clone https://github.com/wlttzzyxgs-design/open-meteo-weather-skill.git
+git clone https://github.com/wlttzzyxgs-design/coordinate-weather.git
 Copy-Item -Recurse `
-  .\open-meteo-weather-skill\skills\open-meteo-weather `
-  "$HOME\.codex\skills\open-meteo-weather"
+  .\coordinate-weather\skills\coordinate-weather `
+  "$HOME\.codex\skills\coordinate-weather"
 ```
 
 macOS / Linux：
 
 ```bash
-git clone https://github.com/wlttzzyxgs-design/open-meteo-weather-skill.git
-cp -R open-meteo-weather-skill/skills/open-meteo-weather \
-  "${CODEX_HOME:-$HOME/.codex}/skills/open-meteo-weather"
+git clone https://github.com/wlttzzyxgs-design/coordinate-weather.git
+cp -R coordinate-weather/skills/coordinate-weather \
+  "${CODEX_HOME:-$HOME/.codex}/skills/coordinate-weather"
 ```
 
 兼容 Agent Skills 的宿主可直接安装：
 
 ```text
-skills/open-meteo-weather
+skills/coordinate-weather
 ```
 
 ### 使用
@@ -49,13 +49,13 @@ skills/open-meteo-weather
 在 Agent 中：
 
 ```text
-$open-meteo-weather 获取 26.881144,103.881832 的天气预报
+$coordinate-weather 获取 26.881144,103.881832 的天气预报
 ```
 
 直接运行 CLI：
 
 ```bash
-python skills/open-meteo-weather/scripts/get_weather.py \
+python skills/coordinate-weather/scripts/get_weather.py \
   --latitude 26.881144 \
   --longitude 103.881832
 ```
@@ -63,7 +63,7 @@ python skills/open-meteo-weather/scripts/get_weather.py \
 风电预设：
 
 ```bash
-python skills/open-meteo-weather/scripts/get_weather.py \
+python skills/coordinate-weather/scripts/get_weather.py \
   --latitude 26.881144 \
   --longitude 103.881832 \
   --preset wind \
@@ -73,7 +73,7 @@ python skills/open-meteo-weather/scripts/get_weather.py \
 英文 JSON：
 
 ```bash
-python skills/open-meteo-weather/scripts/get_weather.py \
+python skills/coordinate-weather/scripts/get_weather.py \
   --latitude 51.5074 \
   --longitude -0.1278 \
   --lang en \
@@ -96,33 +96,24 @@ python skills/open-meteo-weather/scripts/get_weather.py \
 
 ### 免费与商业 API
 
-免费接口：
-
-```text
-https://api.open-meteo.com/v1/forecast
-```
-
-商业接口：
-
-```text
-https://customer-api.open-meteo.com/v1/forecast
-```
+- 免费模式无需 API Key。
+- 商业模式需要配置 `WEATHER_API_KEY`，并切换到商业端点。
 
 配置商业 Key：
 
 Windows PowerShell：
 
 ```powershell
-$env:OPEN_METEO_API_KEY = "your-key"
+$env:WEATHER_API_KEY = "your-key"
 ```
 
 macOS / Linux：
 
 ```bash
-export OPEN_METEO_API_KEY="your-key"
+export WEATHER_API_KEY="your-key"
 ```
 
-`--api-mode auto` 在存在 `OPEN_METEO_API_KEY` 时自动使用商业接口。免费接口仅适用于非商业用途；公司生产、交易或对外服务应按 Open-Meteo 商业许可处理。
+`--api-mode auto` 在存在 `WEATHER_API_KEY` 时自动使用商业接口。免费接口仅适用于非商业用途；公司生产、交易或对外服务应按相应的商业许可处理。
 
 ### 输出
 
@@ -150,7 +141,7 @@ attribution
 
 ```bash
 python -m unittest discover \
-  -s skills/open-meteo-weather/tests \
+  -s skills/coordinate-weather/tests \
   -v
 ```
 
@@ -158,7 +149,7 @@ CI 在 Python 3.10 和 3.12 上运行相同测试。
 
 ## English
 
-A dependency-free Agent Skill that accepts a coordinate pair and retrieves current weather, a 3-day hourly forecast, and daily summaries from Open-Meteo.
+A dependency-free Agent Skill that accepts a coordinate pair and retrieves current weather, a 3-day hourly forecast, and daily summaries from a compatible weather data service.
 
 ### Features
 
@@ -167,13 +158,13 @@ A dependency-free Agent Skill that accepts a coordinate pair and retrieves curre
 - `wind` preset with 80/100/120 m wind, gusts and logarithmic wind shear.
 - Coordinate-based automatic timezone.
 - Chinese or English Markdown/JSON output.
-- Free endpoint by default; optional commercial endpoint through `OPEN_METEO_API_KEY`.
+- Free endpoint by default; optional commercial endpoint through `WEATHER_API_KEY`.
 - Python 3.10+ standard library only.
 
 ### Run
 
 ```bash
-python skills/open-meteo-weather/scripts/get_weather.py \
+python skills/coordinate-weather/scripts/get_weather.py \
   --latitude 51.5074 \
   --longitude -0.1278 \
   --lang en \
@@ -183,10 +174,10 @@ python skills/open-meteo-weather/scripts/get_weather.py \
 ### Commercial API
 
 ```bash
-export OPEN_METEO_API_KEY="your-key"
+export WEATHER_API_KEY="your-key"
 ```
 
-With `--api-mode auto`, the skill switches to `customer-api.open-meteo.com` whenever the key is present. The free API is intended for non-commercial use.
+With `--api-mode auto`, the skill switches to the customer endpoint whenever the key is present. The free endpoint is intended for non-commercial use.
 
 ### Data Licence
 

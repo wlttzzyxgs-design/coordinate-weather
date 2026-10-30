@@ -104,7 +104,7 @@ class ApiModeTests(unittest.TestCase):
 
     def test_auto_uses_customer_with_key(self) -> None:
         self.assertEqual(
-            weather.resolve_api_mode("auto", {"OPEN_METEO_API_KEY": "secret"}),
+            weather.resolve_api_mode("auto", {"WEATHER_API_KEY": "secret"}),
             ("customer", "secret"),
         )
 

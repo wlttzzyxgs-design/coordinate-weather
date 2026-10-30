@@ -1,9 +1,9 @@
 ---
-name: open-meteo-weather
-description: Fetch current and 3-day hourly/daily weather from Open-Meteo using latitude and longitude, with general or wind-energy presets and optional commercial API access.
+name: coordinate-weather
+description: Fetch current and 3-day hourly/daily weather from a compatible weather data service using latitude and longitude, with general or wind-energy presets and optional commercial API access.
 ---
 
-# Open-Meteo Weather
+# Coordinate Weather
 
 Use this skill when the user supplies a WGS84 latitude/longitude and asks for current weather, a forecast, daily planning conditions, or wind-energy weather risk.
 
@@ -39,10 +39,10 @@ Common options:
 
 ## API Modes
 
-- Default `auto` uses the free endpoint unless `OPEN_METEO_API_KEY` is set.
-- With `OPEN_METEO_API_KEY`, `auto` switches to `customer-api.open-meteo.com`.
+- Default `auto` uses the free endpoint unless `WEATHER_API_KEY` is set.
+- With `WEATHER_API_KEY`, `auto` switches to the customer endpoint.
 - Never print, persist or commit the API key.
-- Mention that the free endpoint is for non-commercial use; production business use needs an Open-Meteo commercial licence.
+- Mention that the free endpoint is for non-commercial use; production business use needs an appropriate commercial licence.
 
 ## Data Rules
 
